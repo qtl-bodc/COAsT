@@ -26,12 +26,16 @@ if not os.path.isdir(dn_files):
     if not os.path.isdir(dn_files):
         print(f"location f{dn_files} cannot be found")
 
-nemo_t = coast.NEMO( fn_data=dn_files+fn_nemo_grid_t_dat, 
-                    fn_domain=dn_files+fn_nemo_dom, grid_ref='t-grid' )
-nemo_u = coast.NEMO( fn_data=dn_files+fn_nemo_grid_u_dat, 
-                    fn_domain=dn_files+fn_nemo_dom, grid_ref='u-grid' )
-nemo_v = coast.NEMO( fn_data=dn_files+fn_nemo_grid_v_dat, 
-                    fn_domain=dn_files+fn_nemo_dom, grid_ref='v-grid' )
-nemo_f = coast.NEMO( fn_domain=dn_files+fn_nemo_dom, grid_ref='f-grid' )
+nemo_t = coast.NEMO(fn_data=dn_files + fn_nemo_grid_t_dat,
+                    fn_domain=dn_files + fn_nemo_dom, grid_ref='t-grid')  # , chunks={"time_counter":3})
+nemo_u = coast.NEMO(fn_data=dn_files + fn_nemo_grid_u_dat,
+                    fn_domain=dn_files + fn_nemo_dom, grid_ref='u-grid')  # , chunks={"time_counter":3} )
+nemo_v = coast.NEMO(fn_data=dn_files + fn_nemo_grid_v_dat,
+                    fn_domain=dn_files + fn_nemo_dom, grid_ref='v-grid')  # , chunks={"time_counter":3} )
+nemo_f = coast.NEMO(fn_domain=dn_files + fn_nemo_dom, grid_ref='f-grid')  # , chunks={"time_counter":3} )
 
-tran = coast.Transect( (54,-15), (56,-12), nemo_f, nemo_t, nemo_u, nemo_v )
+tran = coast.Transect((54, -15), (56, -12), nemo_f, nemo_t, nemo_u, nemo_v)
+
+#tran.transport_across_AB()
+
+#print(tran.data_tran)

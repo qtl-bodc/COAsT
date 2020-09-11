@@ -87,10 +87,14 @@ class NEMO(COAsT):
                                    'depthw_0':'depth_0', 'deptht_0':'depth_0',
                                    'ln_sco':'ln_sco'}
 
-    def load_domain(self, fn_domain, chunks):
+    def load_domain(self, fn_domain, chunks: dict = None):
         ''' Loads domain file and renames dimensions with dim_mapping_domain'''
         # Load xarrat dataset
-        dataset_domain = xr.open_dataset(fn_domain)
+        if chunks:
+            dataset_domain = xr.open_dataset(fn_domain, chunks=chunks)
+        else:
+            dataset_domain = xr.open_dataset(fn_domain)
+
         self.domain_loaded = True
         # Rename dimensions
         for key, value in self.dim_mapping_domain.items():

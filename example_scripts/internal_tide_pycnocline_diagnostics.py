@@ -58,10 +58,10 @@ except:
     fn_nemo_dom = 'COAsT_example_NEMO_domain.nc'
 
     sci_t = coast.NEMO(dn_files + fn_nemo_grid_t_dat,
-                     dn_files + fn_nemo_dom, grid_ref='t-grid', multiple=True)
+                     dn_files + fn_nemo_dom, grid_ref='t-grid', multiple=True, chunks={"time_counter":3})
 
     # create an empty w-grid object, to store stratification
-    sci_w = coast.NEMO( fn_domain = dn_files + fn_nemo_dom, grid_ref='w-grid')
+    sci_w = coast.NEMO( fn_domain = dn_files + fn_nemo_dom, grid_ref='w-grid', chunks={"time_counter":3})
 print('* Loaded ',config, ' data')
 
 #################################################
