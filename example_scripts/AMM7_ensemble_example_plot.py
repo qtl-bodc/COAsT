@@ -1,0 +1,75 @@
+"""
+AMM15_example_plot.py 
+
+Make simple AMM15 SST plot.
+
+"""
+
+#%%
+import coast
+import numpy as np
+import xarray as xr
+import matplotlib.pyplot as plt
+import matplotlib.colors as colors # colormap fiddling
+
+#################################################
+#%%  Loading  data
+#################################################
+
+
+config = 'AMM7'
+dir_nam = "/work/sarzed/campus/analysis/northsea/"
+fil_nam = "northsea.mersea.grid_U_timeseries.nc"
+dom_nam = "/work/sarzed/campus/grid/CO6_mesh/mesh_hgr_AMM7_CO6.nc"  
+dom_nam = "/work/sarzed/campus/grid/CO6_mesh/mesh_zgr_AMM7_CO6.nc"
+# Actually need to try loading multiple domain files.
+        
+
+sci_u = coast.NEMO(dir_nam + fil_nam,
+        dom_nam, grid_ref='u-grid', multiple=False)
+
+sci_v = coast.NEMO(dir_nam + fil_nam.replace('U_timeseries','V_timeseries'), 
+        dom_nam, grid_ref='v-grid', multiple=False)
+
+# create an empty w-grid object, to store stratification
+sci_w = coast.NEMO( fn_domain = dom_nam, grid_ref='w-grid')
+
+
+print('* Loaded ',config, ' data')
+
+#################################################
+#%% subset of data and domain ##
+#################################################
+# Pick out a North Sea subdomain
+print('* Extract North Sea subdomain')
+ind_sci = sci_t.subset_indices([51,-4], [62,15])
+sci_nwes_t = sci_t.isel(y_dim=ind_sci[0], x_dim=ind_sci[1]) #nwes = northwest europe shelf
+ind_sci = sci_w.subset_indices([51,-4], [62,15])
+sci_nwes_w = sci_w.isel(y_dim=ind_sci[0], x_dim=ind_sci[1]) #nwes = northwest europe shelf
+
+#%% Apply masks to temperature and salinity
+if config == 'AMM15':
+    sci_nwes_t.dataset['temperature_m'] = sci_nwes_t.dataset.temperature.where( sci_nwes_t.dataset.mask.expand_dims(dim=sci_nwes_t.dataset['t_dim'].sizes) > 0) 
+    sci_nwes_t.dataset['salinity_m'] = sci_nwes_t.dataset.salinity.where( sci_nwes_t.dataset.mask.expand_dims(dim=sci_nwes_t.dataset['t_dim'].sizes) > 0) 
+
+else:
+    # Apply fake masks to temperature and salinity
+    sci_nwes_t.dataset['temperature_m'] = sci_nwes_t.dataset.temperature
+    sci_nwes_t.dataset['salinity_m'] = sci_nwes_t.dataset.salinity
+
+
+
+#%% Plots
+fig = plt.figure()
+
+plt.pcolormesh( sci_t.dataset.longitude, sci_t.dataset.latitude, sci_t.dataset.temperature.isel(z_dim=0).squeeze())
+#plt.xlabel('longitude')
+#plt.ylabel('latitude')
+#plt.colorbar()
+plt.axis('off')
+plt.show()
+
+
+fig.savefig('AMM15_SST_nocolorbar.png', dpi=120)
+
+
