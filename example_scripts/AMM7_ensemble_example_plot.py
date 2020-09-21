@@ -32,6 +32,7 @@ sci_u = coast.NEMO(dir_nam + fil_nam,
 sci_v = coast.NEMO(dir_nam + fil_nam.replace('U_timeseries','V_timeseries'), 
         dom_nam, grid_ref='v-grid', multiple=False)
 
+# list variables in an object: sci_v.dataset
 
 ## Plot
 sci_u.dataset.vozocrtx.isel(z_dim=0).isel(y_dim=30).plot() 
