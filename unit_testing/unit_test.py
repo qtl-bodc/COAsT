@@ -136,7 +136,7 @@ except:
 subsec = subsec+1
 
 pass_test = False
-nemo_f = coast.NEMO( fn_domain=dn_files+fn_nemo_dom, grid_ref='f-grid' )
+nemo_f = coast.NEMO(fn_domain=dn_files+fn_nemo_dom, grid_ref='f-grid')
 
 if nemo_f.dataset._coord_names == {'depth_0', 'latitude', 'longitude'}:
     var_name_list = []
@@ -156,8 +156,8 @@ else:
 subsec = subsec+1
 
 try:
-    nemo_t = coast.NEMO( fn_data=dn_files+fn_nemo_grid_t_dat,
-             fn_domain=dn_files+fn_nemo_dom, grid_ref='t-grid' )
+    nemo_t = coast.NEMO( fn_data=dn_files+fn_nemo_grid_t_dat, fn_domain=dn_files+fn_nemo_dom, grid_ref='t-grid', chunks={"time_counter":3})
+
     if not np.isclose(np.nansum(nemo_t.dataset.depth_0.values), 1705804300.0):
         raise ValueError(" X - NEMO depth_0 failed on t-grid failed")
     nemo_u = coast.NEMO( fn_data=dn_files+fn_nemo_grid_u_dat,
