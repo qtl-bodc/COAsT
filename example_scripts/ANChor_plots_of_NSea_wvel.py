@@ -49,9 +49,9 @@ fil_feb = 'AMM60_1h_201202??_*_NorthSea.nc'
 fil_aug = 'AMM60_1h_20120???_201208??_NorthSea.nc'
 
 print('Process w-vel Feb2012')
-load_and_export( fn_name=fil_feb, ofile='AMM60_w_feb2012.nc')
+load_and_export( fil_feb, ofile='AMM60_w_feb2012.nc')
 print('Process w-vel Aug2012')
-load_and_export( fn_name=fil_aug, ofile='AMM60_w_aug2012.nc')
+load_and_export( fil_aug, ofile='AMM60_w_aug2012.nc')
 
 print('Done')
 
