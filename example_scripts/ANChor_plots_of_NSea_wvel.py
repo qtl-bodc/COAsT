@@ -7,35 +7,54 @@ This needs to move to the above
 
 #%%
 import coast
-#import numpy as np
-#import xarray as xr
-#import dask
-#import matplotlib.pyplot as plt
+import numpy as np
+import xarray as xr
+import dask
 import matplotlib.pyplot as plt
 #import matplotlib.colors as colors # colormap fiddling
 
-#################################################
-#%%  Loading and initialising methods ##
-#################################################
-    
-dir_nam = "/projectsa/anchor/NEMO/AMM60/"
-fil_nam = "AMM60_1h_20100818_20100822_NorthSea.nc"
-dom_nam = "/projectsa/anchor/NEMO/AMM60/mesh_mask.nc"
-        
-dir_nam = '/projectsa/NEMO/jelt/AMM60_ARCHER_DUMP/AMM60smago/EXP_NSea/OUTPUT/'
-fil_nam = 'AMM60_1h_20120204_20120208_NorthSea.nc'
+def load_and_export(fn_nemo, ofile):
 
-chunks = {"x":10, "y":10, "time_counter":10}
-sci_w = coast.NEMO(dir_nam + fil_nam, 
-                 dom_nam, grid_ref='w-grid', multiple=True, chunks=chunks)
+	#################################################
+	#%%  Loading and initialising methods ##
+	#################################################
+	    
+	dir_nam = "/projectsa/anchor/NEMO/AMM60/"
+	#fil_nam = "AMM60_1h_20100818_20100822_NorthSea.nc"
+	dom_nam = "/projectsa/anchor/NEMO/AMM60/mesh_mask.nc"
+		
+	dir_nam = '/projectsa/NEMO/jelt/AMM60_ARCHER_DUMP/AMM60smago/EXP_NSea/OUTPUT/'
+	#fil_feb = 'AMM60_1h_201202??_*_NorthSea.nc'
+	#fil_aug = 'AMM60_1h_20120???_201208??_NorthSea.nc'
 
-sci_w.dataset = sci_w.dataset.swap_dims({'depthw':'z_dim'})
-#################################################
-#%% subset of data and domain ##
-#################################################
-# Pick out a North Sea subdomain
-ind_sci = sci_w.subset_indices([51,-4], [60,15])
-sci_nwes_w = sci_w.isel(y_dim=ind_sci[0], x_dim=ind_sci[1]) #nwes = northwest europe shelf
+	chunks = {"x":10, "y":10, "time_counter":10}
+
+	nemo_w = coast.NEMO(dir_nam + fn_nemo, 
+			 dom_nam, grid_ref='w-grid', multiple=True, chunks=chunks)
+	nemo_w.dataset = nemo_w.dataset.swap_dims({'depthw':'z_dim'})
+
+	#################################################
+	#%% subset of data and domain ##
+	#################################################
+	# Pick out a North Sea subdomain
+	ind_sci = nemo_w.subset_indices([51,-4], [60,15])
+	nemo_nwes_w = nemo_w.isel(y_dim=ind_sci[0], x_dim=ind_sci[1]) #nwes = northwest europe shelf
+
+	print('computing w field...')
+	w_xarr = np.abs(nemo_nwes_w.dataset.wo).max(dim='z_dim').mean(dim='t_dim').compute()
+	print('exporting to netCDF...')
+	w_xarr.to_netcdf(ofile, format="NETCDF4")
+	
+fil_feb = 'AMM60_1h_201202??_*_NorthSea.nc'
+fil_aug = 'AMM60_1h_20120???_201208??_NorthSea.nc'
+
+print('Process w-vel Feb2012')
+load_and_export( fn_name=fil_feb, ofile='AMM60_w_feb2012.nc')
+print('Process w-vel Aug2012')
+load_and_export( fn_name=fil_aug, ofile='AMM60_w_aug2012.nc')
+
+print('Done')
+
 
 #%% Compute a diffusion from w-vel
 Kz = (sci_nwes_w.dataset.wo * sci_nwes_w.dataset.e3_0).sum(dim='z_dim').mean(dim='t_dim')
