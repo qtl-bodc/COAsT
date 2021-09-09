@@ -7,7 +7,6 @@
 		1000
 	],
 	"dataset": {
-		"filepath": "path_to_file",
 		"dimension_map": {
 			"ex1": "time_counter",
 			"ex2": "deptht",
